@@ -72,42 +72,37 @@
 
 
 
-
-
-
 <script>
-    //crea dinamicamente los inputs para agregar productos
+    // Crea dinámicamente los inputs para agregar productos
     document.getElementById('agregarProducto').addEventListener('click', function () {
         var productosContainer = document.getElementById('productos-container');
         var productoHtml = `
             <div class="producto">
-                    <div class="col-xs-12 col-sm-12 col-md-6 mt-2">
-                        <div class="form-group">
-                            <strong>Poductos disponibles</strong> <br>
-                            <select name="productos_id[]" class="form-control producto-select">
-                                <option value="">-- Productos en almacenes --</option>
-                                @foreach($productosDisponibles as $producto)
-                                {{-- <option value="{{ $producto->id }}">{{ $producto->nombre_producto }},  Disponible:{{ $producto->CantidadDisponible }},  Precio: {{$producto->costo_unitario }}</option> --}}
+                <div class="col-xs-12 col-sm-12 col-md-6 mt-2">
+                    <div class="form-group">
+                        <strong>Productos disponibles</strong> <br>
+                        <select name="productos_id[]" class="form-control producto-select">
+                            <option value="">-- Productos en almacenes --</option>
+                            @foreach($productosDisponibles as $producto)
                                 <option value="{{ $producto->id }}" data-costo="{{ $producto->costo_unitario }}" data-cantidad-disponible="{{ $producto->CantidadDisponible }}">{{ $producto->nombre_producto }}, Disponible: {{ $producto->CantidadDisponible }}, Precio: {{ $producto->costo_unitario }}</option>
-                                @endforeach3
-                            </select>
-                        </div>
+                            @endforeach
+                        </select>
                     </div>
-                    <div class="col-xs-12 col-sm-12 col-md-6 mt-2">
-                        <div class="form-group">
-                            <strong>Cantidad:</strong>
-                            <input type="number" name="Cantidad[]" class="form-control cantidad-input">
-                        </div>
-                    </div>
-                    <div class="col-xs-12 col-sm-12 col-md-6 mt-2">
-                        <div class="form-group">
-                            <strong>Costo :</strong>
-                            <input type="number" name="Costo[]" class="form-control costo-input" readonly>
-                        </div>
-                    </div>
-                    <hr>
                 </div>
-        <hr>
+                <div class="col-xs-12 col-sm-12 col-md-6 mt-2">
+                    <div class="form-group">
+                        <strong>Cantidad:</strong>
+                        <input type="number" name="Cantidad[]" class="form-control cantidad-input">
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-12 col-md-6 mt-2">
+                    <div class="form-group">
+                        <strong>Costo :</strong>
+                        <input type="number" name="Costo[]" class="form-control costo-input" readonly>
+                    </div>
+                </div>
+                <hr>
+            </div>
         `;
         productosContainer.insertAdjacentHTML('beforeend', productoHtml);
         // Después de agregar el nuevo campo dinámico, vincular el evento de cambio nuevamente
@@ -115,6 +110,9 @@
             element.addEventListener('change', calcularCosto);
         });
     });
+
+
+
 
     //validaciones de Costo, y Cantidad disponible en inventario
     function calcularCosto() {
@@ -139,17 +137,16 @@
             } else {
                 costoInput.value = '';
             }
-    });
-}
-
-    // Llamar a la función calcularCosto cada vez que cambia la cantidad o se selecciona un nuevo producto
+        });
+    }
+    //Llamar a la función calcularCosto cada vez que cambia la cantidad o se selecciona un nuevo producto
     document.querySelectorAll('.cantidad-input, .producto-select').forEach(function(element) {
         element.addEventListener('change', calcularCosto);
     });
+
+
+
 </script>
-
-
-
 
 
 

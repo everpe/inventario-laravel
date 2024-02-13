@@ -34,7 +34,9 @@ class TransaccionController extends Controller
             JOIN productos ON inventarios.producto_id = productos.id
         ');
 
-        return view('create-transaccion')->with([ 'productosDisponibles' => $productosDisponibles]);
+        return view('create-transaccion')->with([ 
+            'productosDisponibles' => $productosDisponibles, 
+            'codigoUidTransaccion' => uniqid()]);
     }
 
     /**
@@ -46,7 +48,7 @@ class TransaccionController extends Controller
         $transaccionId = DB::table('transacciones')->insertGetId([
             'Fecha' => now(),
             'Comentarios' => $request->Comentarios,
-            'Codigo' => uniqid(),
+            'Codigo' => $request->codigoTransaccionUid,
         ]);
 
         $contador = 0;
@@ -60,11 +62,17 @@ class TransaccionController extends Controller
                 'Cantidad' => $request->Cantidad[$contador],
                 'Costo' => $request->Costo[$contador],
             ]);
-            // echo "Número: $inventario->id \n";
+          //  echo "Número: $inventario->id \n";
             $contador++;
         }
-        dd($request->all());
-    
+        $detallesTransacciones = DB::table('detalle_transacciones')
+        ->join('transacciones', 'detalle_transacciones.transaccion_id', '=', 'transacciones.id')
+        ->join('productos', 'detalle_transacciones.producto_id', '=', 'productos.id')
+        ->join('almacenes', 'detalle_transacciones.almacen_id', '=', 'almacenes.id')
+        ->select('detalle_transacciones.*', 'transacciones.Comentarios', 'transacciones.Codigo as codigoTransaccion', 'transacciones.id as numeroTransaccion','productos.Nombre as nombreProducto', 'almacenes.nombre AS nombreAlmacen')
+        ->get();
+        //dd($request->all());
+        return view('index')->with([ 'transaccionesRealizadas' => $detallesTransacciones]);
     }
 
     /**

@@ -9,9 +9,6 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    // $table->foreign('transaccion_id')->references('id')->on('transacciones');
-    // $table->foreign('producto_id')->references('id')->on('productos');
-    // $table->foreign('almacen_id')->references('id')->on('almacenes');
     public function up(): void
     {
         Schema::create('detalle_transacciones', function (Blueprint $table) {

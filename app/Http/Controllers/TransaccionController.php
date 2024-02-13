@@ -13,7 +13,14 @@ class TransaccionController extends Controller
      */
     public function index()
     {
-        return view('index');
+        $detallesTransacciones = DB::table('detalle_transacciones')
+        ->join('transacciones', 'detalle_transacciones.transaccion_id', '=', 'transacciones.id')
+        ->join('productos', 'detalle_transacciones.producto_id', '=', 'productos.id')
+        ->join('almacenes', 'detalle_transacciones.almacen_id', '=', 'almacenes.id')
+        ->select('detalle_transacciones.*', 'transacciones.Comentarios', 'transacciones.Codigo as codigoTransaccion', 'transacciones.id as numeroTransaccion','productos.Nombre as nombreProducto', 'almacenes.nombre AS nombreAlmacen')
+        ->get();
+        // dd($detallesTransacciones);
+        return view('index')->with([ 'transaccionesRealizadas' => $detallesTransacciones]);;
     }
 
     /**

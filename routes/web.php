@@ -19,4 +19,3 @@ Route::get('/', function () {
 });
 
 Route::resource('transacciones', TransaccionController::class);
-// Route::resource('transacciones', TransaccionController::class);

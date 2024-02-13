@@ -4,6 +4,7 @@
 <div class="row">
     <div class="col-12">
         <div>
+            <br><br>
             <h2 class="text-white">Lista de ventas realizadas</h2>
         </div>
         <div>
@@ -12,28 +13,55 @@
     </div>
 
     <div class="col-12 mt-4">
-        <table class="table table-bordered text-white">
-            <tr class="text-secondary">
-                <th>Id</th>
-                <th>Descripción</th>
-                <th>Fecha</th>
-                <th>Costo</th>
-                <th>Cantidad</th>
-            </tr>
-            <tr>
-                <td class="fw-bold">Estudiar Laravel</td>
-                <td>Ver video: tu primer CRUD con laravel 10 en el canal de YouDevs</td>
-                <td>
-                    31/03/23
-                </td>
-                <td>
-                    <span class="badge bg-warning fs-6">Pendiente</span>
-                </td>
-                <td>
-                    <p>53</p>
-                </td>
-            </tr>
+        <table>
+            <tbody>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Cantidad</th>
+                            <th>Costo</th>
+                            <th>Comentarios</th>
+                            <th>Código Transacción</th>
+                            <th>Número Transacción</th>
+                            <th>Nombre Producto</th>
+                            <th>Nombre Almacén</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($transaccionesRealizadas as $dato)
+                        <tr>
+                            <td>{{ $dato->Cantidad }}</td>
+                            <td>{{ $dato->Costo }}</td>
+                            <td>{{ $dato->Comentarios }}</td>
+                            <td>{{ $dato->codigoTransaccion }}</td>
+                            <td>{{ $dato->numeroTransaccion }}</td>
+                            <td>{{ $dato->nombreProducto }}</td>
+                            <td>{{ $dato->nombreAlmacen }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </tbody>
         </table>
     </div>
 </div>
+<style>
+    table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #333;
+    color: #fff;
+}
+
+/* Estilos para las celdas de la tabla */
+td, th {
+    padding: 10px;
+    border: 1px solid #fff; /* Añade bordes a las celdas para mayor contraste */
+}
+
+/* Estilos para las filas pares */
+tbody tr:nth-child(even) {
+    background-color: #444; /* Color de fondo ligeramente más oscuro para filas pares */
+}
+</style>
 @endsection

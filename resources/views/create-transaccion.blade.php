@@ -16,9 +16,6 @@
     <form action="{{route('transacciones.store')}}"  method="POST">
         @csrf
         <div class="row">
-            {{-- <h1>Facturación y ventas</h1> --}}
-            {{-- <p>Número: <strong>001</strong></p>
-            <p>Código: <strong>FACT-2024</strong></p> --}}
             <div class="col-xs-12 col-sm-12 col-md-12 mt-2">
                 <div class="form-group">
                     <strong>Comentarios:</strong>
@@ -37,10 +34,11 @@
                     <div class="col-xs-12 col-sm-12 col-md-6 mt-2">
                         <div class="form-group">
                             <strong>Poductos disponibles</strong> <br>
-                            <select name="productos_id[]" class="form-control">
+                            <select name="productos_id[]" class="form-control producto-select">
                                 <option value="">-- Productos en almacenes --</option>
                                 @foreach($productosDisponibles as $producto)
-                                <option value="{{ $producto->id }}">{{ $producto->nombre_producto }},  Disponible:{{ $producto->CantidadDisponible }},  Precio: {{$producto->costo_unitario }}</option>
+                                {{-- <option value="{{ $producto->id }}">{{ $producto->nombre_producto }},  Disponible:{{ $producto->CantidadDisponible }},  Precio: {{$producto->costo_unitario }}</option> --}}
+                                <option value="{{ $producto->id }}" data-costo="{{ $producto->costo_unitario }}" data-cantidad-disponible="{{ $producto->CantidadDisponible }}">{{ $producto->nombre_producto }}, Disponible: {{ $producto->CantidadDisponible }}, Precio: {{ $producto->costo_unitario }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -48,13 +46,13 @@
                     <div class="col-xs-12 col-sm-12 col-md-6 mt-2">
                         <div class="form-group">
                             <strong>Cantidad:</strong>
-                            <input type="number" name="Cantidad[]" class="form-control">
+                            <input type="number" name="Cantidad[]" class="form-control cantidad-input">
                         </div>
                     </div>
                     <div class="col-xs-12 col-sm-12 col-md-6 mt-2">
                         <div class="form-group">
                             <strong>Costo :</strong>
-                            <input type="number" name="Costo[]" class="form-control" max="9999999">
+                            <input type="number" name="Costo[]" class="form-control costo-input" readonly>
                         </div>
                     </div>
                     <hr>
@@ -68,39 +66,142 @@
 </div>
 
 
+
+
+
+
 <script>
     document.getElementById('agregarProducto').addEventListener('click', function () {
         var productosContainer = document.getElementById('productos-container');
         var productoHtml = `
             <div class="producto">
-                <div class="col-xs-12 col-sm-12 col-md-6 mt-2">
-                    <div class="form-group">
-                        <strong>Poductos disponibles </strong> <br>
-                        <select name="productos_id[]" class="form-control">
-                            <option value="">-- Productos en almacenes --</option>
-                            @foreach($productosDisponibles as $producto)
-                            <option value="{{ $producto->id }}">{{ $producto->nombre_producto }},  Disponible:{{ $producto->CantidadDisponible }},  Precio: {{$producto->costo_unitario }}</option>
-                            @endforeach
-                        </select>
+                    <div class="col-xs-12 col-sm-12 col-md-6 mt-2">
+                        <div class="form-group">
+                            <strong>Poductos disponibles</strong> <br>
+                            <select name="productos_id[]" class="form-control producto-select">
+                                <option value="">-- Productos en almacenes --</option>
+                                @foreach($productosDisponibles as $producto)
+                                {{-- <option value="{{ $producto->id }}">{{ $producto->nombre_producto }},  Disponible:{{ $producto->CantidadDisponible }},  Precio: {{$producto->costo_unitario }}</option> --}}
+                                <option value="{{ $producto->id }}" data-costo="{{ $producto->costo_unitario }}" data-cantidad-disponible="{{ $producto->CantidadDisponible }}">{{ $producto->nombre_producto }}, Disponible: {{ $producto->CantidadDisponible }}, Precio: {{ $producto->costo_unitario }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
-                </div>
-                <div class="col-xs-12 col-sm-12 col-md-6 mt-2">
-                    <div class="form-group">
-                        <strong>Cantidad :</strong>
-                        <input type="number" name="Cantidad[]" class="form-control">
+                    <div class="col-xs-12 col-sm-12 col-md-6 mt-2">
+                        <div class="form-group">
+                            <strong>Cantidad:</strong>
+                            <input type="number" name="Cantidad[]" class="form-control cantidad-input">
+                        </div>
                     </div>
-                </div>
-                <div class="col-xs-12 col-sm-12 col-md-6 mt-2">
-                    <div class="form-group">
-                        <strong>Costo :</strong>
-                        <input type="number" name="Costo[]" class="form-control">
+                    <div class="col-xs-12 col-sm-12 col-md-6 mt-2">
+                        <div class="form-group">
+                            <strong>Costo :</strong>
+                            <input type="number" name="Costo[]" class="form-control costo-input" readonly>
+                        </div>
                     </div>
+                    <hr>
                 </div>
-            </div>
+        <hr>
+        `;
+        productosContainer.insertAdjacentHTML('beforeend', productoHtml);
+        // Después de agregar el nuevo campo dinámico, vincular el evento de cambio nuevamente
+        document.querySelectorAll('.cantidad-input, .producto-select').forEach(function(element) {
+            element.addEventListener('change', calcularCosto);
+        });
+    });
+
+
+    function calcularCosto() {
+    var productoSelects = document.querySelectorAll('.producto-select');
+    productoSelects.forEach(function(select) {
+        var cantidadInput = select.closest('.producto').querySelector('.cantidad-input');
+        var costoInput = select.closest('.producto').querySelector('.costo-input');
+        var costoUnitario = parseFloat(select.options[select.selectedIndex].getAttribute('data-costo'));
+        var cantidad = parseFloat(cantidadInput.value);
+        var cantidadDisponible = parseFloat(select.options[select.selectedIndex].getAttribute('data-cantidad-disponible'));
+        
+        // Verificar si la cantidad ingresada es mayor que la cantidad disponible
+        if (cantidad > cantidadDisponible) {
+            alert('¡La cantidad ingresada excede la cantidad disponible!');
+            cantidadInput.value = cantidadDisponible; // Establecer la cantidad disponible como la cantidad máxima permitida
+            cantidad = cantidadDisponible; // Actualizar la cantidad con la cantidad disponible
+        }
+        
+        // Calcular el costo solo si la cantidad es válida
+        if (!isNaN(costoUnitario) && !isNaN(cantidad)) {
+            costoInput.value = (costoUnitario * cantidad).toFixed(2);
+        } else {
+            costoInput.value = '';
+        }
+    });
+}
+
+    // Llamar a la función calcularCosto cada vez que cambia la cantidad o se selecciona un nuevo producto
+    document.querySelectorAll('.cantidad-input, .producto-select').forEach(function(element) {
+        element.addEventListener('change', calcularCosto);
+    });
+</script>
+
+
+
+
+
+
+
+
+
+{{-- <script>
+    document.getElementById('agregarProducto').addEventListener('click', function () {
+        var productosContainer = document.getElementById('productos-container');
+        var productoHtml = `
+            <div class="producto">
+                    <div class="col-xs-12 col-sm-12 col-md-6 mt-2">
+                        <div class="form-group">
+                            <strong>Poductos disponibles</strong> <br>
+                            <select name="productos_id[]" class="form-control producto-select">
+                                <option value="">-- Productos en almacenes --</option>
+                                @foreach($productosDisponibles as $producto)
+                                <option value="{{ $producto->id }}" data-costo="{{ $producto->costo_unitario }}">{{ $producto->nombre_producto }}, Disponible: {{ $producto->CantidadDisponible }}, Precio: {{ $producto->costo_unitario }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-sm-12 col-md-6 mt-2">
+                        <div class="form-group">
+                            <strong>Cantidad:</strong>
+                            <input type="number" name="Cantidad[]" class="form-control cantidad-input">
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-sm-12 col-md-6 mt-2">
+                        <div class="form-group">
+                            <strong>Costo :</strong>
+                            <input type="number" name="Costo[]" class="form-control costo-input" readonly>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
         <hr>
         `;
         productosContainer.insertAdjacentHTML('beforeend', productoHtml);
     });
-</script>
+
+
+    function calcularCosto() {
+        var productoSelects = document.querySelectorAll('.producto-select');
+        productoSelects.forEach(function(select) {
+            var cantidadInput = select.closest('.producto').querySelector('.cantidad-input');
+            var costoInput = select.closest('.producto').querySelector('.costo-input');
+            var costoUnitario = parseFloat(select.options[select.selectedIndex].getAttribute('data-costo'));
+            var cantidad = parseFloat(cantidadInput.value);
+            costoInput.value = isNaN(costoUnitario) || isNaN(cantidad) ? '' : (costoUnitario * cantidad).toFixed(2);
+            console.log('holaa');
+        });
+    }
+
+    // Llamar a la función calcularCosto cada vez que cambia la cantidad o se selecciona un nuevo producto
+    document.querySelectorAll('.cantidad-input, .producto-select').forEach(function(element) {
+        element.addEventListener('change', calcularCosto);
+    });
+</script> --}}
 @endsection
 

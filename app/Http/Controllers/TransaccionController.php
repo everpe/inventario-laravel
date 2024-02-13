@@ -21,34 +21,41 @@ class TransaccionController extends Controller
      */
     public function create()
     {
- 
-        // $productosDisponibles = DB::select('SELECT * FROM inventarios');
-
         $productosDisponibles = DB::select('
-        SELECT inventarios.*, productos.nombre AS nombre_producto
-        FROM inventarios
-        JOIN productos ON inventarios.producto_id = productos.id
-    ');
+            SELECT inventarios.*, productos.nombre AS nombre_producto, productos.CostoUnitario as costo_unitario
+            FROM inventarios
+            JOIN productos ON inventarios.producto_id = productos.id
+        ');
 
-            // Retornar la vista 'create-transaccion' con los datos pasados
-        return view('create-transaccion')->with([
-            'productosDisponibles' => $productosDisponibles
-        ]);
+        return view('create-transaccion')->with([ 'productosDisponibles' => $productosDisponibles]);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * permite registra una transaccion y el detalle de sus productos.
      */
     public function store(Request $request)
     {
    
         $transaccionId = DB::table('transacciones')->insertGetId([
-            // Colocar aquí los valores de los campos de la tabla 'transacciones'
             'Fecha' => now(),
             'Comentarios' => $request->Comentarios,
             'Codigo' => uniqid(),
-            // Otros campos de la transacción
         ]);
+
+        $contador = 0;
+
+        foreach ($request->productos_id as $inventarioId) {
+            $inventario = DB::table('inventarios')->where('id', $inventarioId)->first();
+            DB::table('detalle_transacciones')->insert([
+                'transaccion_id' => $transaccionId,
+                'producto_id' => $inventario->producto_id,
+                'almacen_id' => $inventario->almacen_id,
+                'Cantidad' => $request->Cantidad[$contador],
+                'Costo' => $request->Costo[$contador],
+            ]);
+            // echo "Número: $inventario->id \n";
+            $contador++;
+        }
         dd($request->all());
     
     }

@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreignId('producto_id')->constrained('productos');
             $table->foreignId('almacen_id')->constrained('almacenes');
             $table->integer('Cantidad');
-            $table->decimal('Costo',  8,  2);
+            $table->decimal('Costo',  20,  2);
             $table->timestamps();
         });
     }

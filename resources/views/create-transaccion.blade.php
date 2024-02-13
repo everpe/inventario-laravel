@@ -76,6 +76,7 @@
 
 
 <script>
+    //crea dinamicamente los inputs para agregar productos
     document.getElementById('agregarProducto').addEventListener('click', function () {
         var productosContainer = document.getElementById('productos-container');
         var productoHtml = `
@@ -88,7 +89,7 @@
                                 @foreach($productosDisponibles as $producto)
                                 {{-- <option value="{{ $producto->id }}">{{ $producto->nombre_producto }},  Disponible:{{ $producto->CantidadDisponible }},  Precio: {{$producto->costo_unitario }}</option> --}}
                                 <option value="{{ $producto->id }}" data-costo="{{ $producto->costo_unitario }}" data-cantidad-disponible="{{ $producto->CantidadDisponible }}">{{ $producto->nombre_producto }}, Disponible: {{ $producto->CantidadDisponible }}, Precio: {{ $producto->costo_unitario }}</option>
-                                @endforeach
+                                @endforeach3
                             </select>
                         </div>
                     </div>
@@ -115,29 +116,29 @@
         });
     });
 
-
+    //validaciones de Costo, y Cantidad disponible en inventario
     function calcularCosto() {
-    var productoSelects = document.querySelectorAll('.producto-select');
-    productoSelects.forEach(function(select) {
-        var cantidadInput = select.closest('.producto').querySelector('.cantidad-input');
-        var costoInput = select.closest('.producto').querySelector('.costo-input');
-        var costoUnitario = parseFloat(select.options[select.selectedIndex].getAttribute('data-costo'));
-        var cantidad = parseFloat(cantidadInput.value);
-        var cantidadDisponible = parseFloat(select.options[select.selectedIndex].getAttribute('data-cantidad-disponible'));
-        
-        // Verificar si la cantidad ingresada es mayor que la cantidad disponible
-        if (cantidad > cantidadDisponible) {
-            alert('¡La cantidad ingresada excede la cantidad disponible!');
-            cantidadInput.value = cantidadDisponible; // Establecer la cantidad disponible como la cantidad máxima permitida
-            cantidad = cantidadDisponible; // Actualizar la cantidad con la cantidad disponible
-        }
-        
-        // Calcular el costo solo si la cantidad es válida
-        if (!isNaN(costoUnitario) && !isNaN(cantidad)) {
-            costoInput.value = (costoUnitario * cantidad).toFixed(2);
-        } else {
-            costoInput.value = '';
-        }
+        var productoSelects = document.querySelectorAll('.producto-select');
+        productoSelects.forEach(function(select) {
+            var cantidadInput = select.closest('.producto').querySelector('.cantidad-input');
+            var costoInput = select.closest('.producto').querySelector('.costo-input');
+            var costoUnitario = parseFloat(select.options[select.selectedIndex].getAttribute('data-costo'));
+            var cantidad = parseFloat(cantidadInput.value);
+            var cantidadDisponible = parseFloat(select.options[select.selectedIndex].getAttribute('data-cantidad-disponible'));
+            
+            // Verificar si la cantidad ingresada es mayor que la cantidad disponible
+            if (cantidad > cantidadDisponible) {
+                alert('¡La cantidad ingresada excede la cantidad disponible!');
+                cantidadInput.value = cantidadDisponible; // Establecer la cantidad disponible como la cantidad máxima permitida
+                cantidad = cantidadDisponible; // Actualizar la cantidad con la cantidad disponible
+            }
+            
+            // Calcular el costo solo si la cantidad es válida
+            if (!isNaN(costoUnitario) && !isNaN(cantidad)) {
+                costoInput.value = (costoUnitario * cantidad).toFixed(2);
+            } else {
+                costoInput.value = '';
+            }
     });
 }
 

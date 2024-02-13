@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 class TransaccionController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Lista todas las ventas o transacciones que se han realizado.
      */
     public function index()
     {
@@ -20,11 +20,11 @@ class TransaccionController extends Controller
         ->select('detalle_transacciones.*', 'transacciones.Comentarios', 'transacciones.Codigo as codigoTransaccion', 'transacciones.id as numeroTransaccion','productos.Nombre as nombreProducto', 'almacenes.nombre AS nombreAlmacen')
         ->get();
         // dd($detallesTransacciones);
-        return view('index')->with([ 'transaccionesRealizadas' => $detallesTransacciones]);;
+        return view('index')->with([ 'transaccionesRealizadas' => $detallesTransacciones]);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Permite visualizar una ruta que contiene el fomrulario para crear una DetalleTransanccion o Venta.
      */
     public function create()
     {
@@ -40,11 +40,11 @@ class TransaccionController extends Controller
     }
 
     /**
-     * permite registra una transaccion y el detalle de sus productos.
+     * Perrmite registrar una transaccion o Venta y el detalle de sus productos.
      */
     public function store(Request $request)
     {
-   
+        //inserta transaccion o Encabezado
         $transaccionId = DB::table('transacciones')->insertGetId([
             'Fecha' => now(),
             'Comentarios' => $request->Comentarios,
@@ -53,6 +53,7 @@ class TransaccionController extends Controller
 
         $contador = 0;
 
+        //guardamos los items de la venta o detalles
         foreach ($request->productos_id as $inventarioId) {
             $inventario = DB::table('inventarios')->where('id', $inventarioId)->first();
             DB::table('detalle_transacciones')->insert([
@@ -62,9 +63,11 @@ class TransaccionController extends Controller
                 'Cantidad' => $request->Cantidad[$contador],
                 'Costo' => $request->Costo[$contador],
             ]);
-          //  echo "Número: $inventario->id \n";
             $contador++;
         }
+
+
+        //vuelvo y conslto todas las ventas en BD
         $detallesTransacciones = DB::table('detalle_transacciones')
         ->join('transacciones', 'detalle_transacciones.transaccion_id', '=', 'transacciones.id')
         ->join('productos', 'detalle_transacciones.producto_id', '=', 'productos.id')

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->uuid('Codigo');
             $table->dateTime('Fecha')->nullable();
             $table->text('Comentarios')->nullable();
-            $table->timestamps();
+            $table->timestamps();//FechaCreacion y FechaActualziacion
         });
     }
 

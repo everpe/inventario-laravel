@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('productos', function (Blueprint $table) {
             $table->id();
             $table->string('Nombre');
-            $table->decimal('CostoUnitario',  8,  2);
+            $table->decimal('CostoUnitario',  8,  2);//sugerido
             $table->timestamps();
         });
     }
